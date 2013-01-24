@@ -11,19 +11,21 @@ I've implemented 3 refactorings
 Add ruby-refactor.el to you load path.
 Then:
 
-  (require 'ruby-refactor)
+```lisp
+(require 'ruby-refactor)
+```
 
 # Usage
 
 ## Extract to Method:
-Select a region of text and invoke 'ruby-refactor-extract-to-method'.
+Select a region of text and invoke `ruby-refactor-extract-to-method`.
 You'll be prompted for a method name. The method will be created
 above the method you are in with the method contents being the
 selected region. The region will be replaced w/ a call to method.
 
 
 ## Add Parameter:
-'ruby-refactor-add-parameter'
+`ruby-refactor-add-parameter`
 This simply prompts you for a parameter to add to the current
 method definition. If you are on a text, you can just hit enter
 as it will use it by default. There is a custom variable to set
@@ -33,7 +35,7 @@ like shouldn't confuse it.
 ## Extract to Let:
 This is really for use with RSpec
 
-'ruby-refactor-extract-to-let'
+`ruby-refactor-extract-to-let`
 There is a variable for where the 'let' gets placed. It can be
 "top" which is top-most in the file, or "closest" which just
 walks up to the first describe/context it finds.
@@ -41,32 +43,40 @@ You can also specify a different regex, so that you can just
 use "describe" if you want.
 If you are on a line:
 
-  a = Something.else.doing
+```ruby
+a = Something.else.doing
+```
 
 becomes
 
-  let(:a){ Something.else.doing }
+```ruby
+let(:a){ Something.else.doing }
+```
 
 If you are selecting a region:
 
+```ruby
 a = Something.else
-  a.stub(:blah)
+a.stub(:blah)
+```
 
 becomes
 
-  let :a do
-    _a = Something.else
-    _a.stub(:blah)
-    _a
-  end
+```ruby
+let :a do
+  _a = Something.else
+  _a.stub(:blah)
+  _a
+end
+```
 
-In both cases, you need the line, first line to have an ' = ' in it,
+In both cases, you need the line, first line to have an ` = ` in it,
 as that drives conversion.
 
 There is also the bonus that the let will be placed *after* any other
 let statements. It appends it to bottom of the list.
 
-Oh, if you invoke with a prefix arg (C-u, etc.), it'll swap the placement
+Oh, if you invoke with a prefix arg (`C-u`, etc.), it'll swap the placement
 of the let.  If you have location as top, a prefix argument will place
 it closest.  I kinda got nutty with this one.
 
