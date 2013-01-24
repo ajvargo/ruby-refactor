@@ -1,22 +1,46 @@
-;; This is a pretty rough cut so far, so I am not making it public yet.
-;; I've been to lazy to even git init. :) I've been having fun hacking.
+;;; ruby-refactor.el --- A minor mode for Emacs that presents various Ruby refactoring helpers.
 
-;; That said, I've implemented 3 refactorings
+;; Copyright (C) 2013 Andrew J Vargo
+
+;; Author: Andrew J Vargo <ajvargo@gmail.com>
+;; Keywords: refactor ruby
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby,
+;; currently found at https://github.com/ecomba/vim-ruby-refactoring.
+
+;; I've implemented 3 refactorings
 ;;  - Extract to Method
 ;;  - Add Parameter
 ;;  - Extract to Let
 
-;; #######################################################################
-;; Extract to Method:
+; ## Install
+;; Add this file to your load path.
+;; (require 'ruby-refactor)
+
+
+;; ## Extract to Method:
 ;; Select a region of text and invoke 'ruby-refactor-extract-to-method'.
 ;; You'll be prompted for a method name. The method will be created
 ;; above the method you are in with the method contents being the
 ;; selected region. The region will be replaced w/ a call to method.
 
-;; I'd like to tweak this more, to be smart about params. Ideas?
 
-;; #######################################################################
-;; Add Parameter:
+;; ## Add Parameter:
 ;; 'ruby-refactor-add-parameter'
 ;; This simply prompts you for a parameter to add to the current
 ;; method definition. If you are on a text, you can just hit enter
@@ -24,10 +48,10 @@
 ;; if you like parens on your params list.  Default values and the
 ;; like shouldn't confuse it.
 
-;; #######################################################################
-;; Extract to Let:
+;; ## Extract to Let:
+;; This is really for use with RSpec
+
 ;; 'ruby-refactor-extract-to-let'
-;; Oh boy. This one got fun. :)
 ;; There is a variable for where the 'let' gets placed. It can be
 ;; "top" which is top-most in the file, or "closest" which just
 ;; walks up to the first describe/context it finds.
@@ -59,15 +83,11 @@
 ;; it closest.  I kinda got nutty with this one.
 
 
-;; #######################################################################
-;; From the vim plugin, these remain to be done
+;; ## TODO
+;; From the vim plugin, these remain to be done (I don't plan to do them all.)
 ;;  - extract local variable
 ;;  - remove inline temp (sexy!)
 ;;  - convert post conditional
-;;  - a couple others I thought were too dumb to persue
-
-;; Soo..... Give it a try!  What do you think? Edge cases or features missings? Bugs?
-;; Any refactorings you can think ought to go on the todo?
 
 
 (defvar ruby-refactor-mode-map (make-sparse-keymap)
