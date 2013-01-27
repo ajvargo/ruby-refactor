@@ -90,9 +90,6 @@
 ;;  - convert post conditional
 
 
-(defvar ruby-refactor-mode-map (make-sparse-keymap)
-  "Keymap to use in ruby refactor minor mode.")
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations
 (defgroup ruby-refactor nil
@@ -132,6 +129,15 @@ most recent context or describe.  'top (default) places it after
  opening describe "
   :type '(choice (const :tag "place top-most" top)
                  (const :tag "place closest" closest)))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Vars
+(defvar ruby-refactor-mode-map nil
+  "Keymap to use in ruby refactor minor mode.")
+
+(defvar ruby-refactor-mode-hook nil
+  "Hooks run during mode start")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Helper functions
@@ -317,6 +323,7 @@ If a region is not selected, the transformation uses the current line."
   (interactive)
   (message "Not Yet Implmented"))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Official setup and the like
 (defun ruby-refactor-start ()
   (use-local-map ruby-refactor-mode-map)
@@ -325,12 +332,11 @@ If a region is not selected, the transformation uses the current line."
 (defun ruby-refactor-stop ()
   (message "Ruby-Refactor mode disabled"))
 
-(if ruby-refactor-mode-map
-    nil
+(unless ruby-refactor-mode-map
   (setq ruby-refactor-mode-map (make-sparse-keymap))
-  (define-key ruby-refactor-mode-map "\C-c\C-re" 'ruby-refactor-extract-to-method)
-  (define-key ruby-refactor-mode-map "\C-c\C-rp" 'ruby-refactor-add-parameter)
-  (define-key ruby-refactor-mode-map "\C-c\C-rl" 'ruby-refactor-extract-to-let))
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r l") 'ruby-refactor-extract-to-let))
 
 (define-minor-mode ruby-refactor-mode
   "Ruby Refactor minor mode"
@@ -339,7 +345,12 @@ If a region is not selected, the transformation uses the current line."
   :keymap ruby-refactor-mode-map
   :lighter " RubyRef"
   (if ruby-refactor-mode
-      (ruby-refactor-start)
-    (ruby-refactor-stop)))
+      (progn
+        (use-local-map ruby-refactor-mode-map)
+        (run-hooks 'ruby-refactor-mode-hook)
+      (ruby-refactor-start))
+    (progn
+      (use-local-map nil)
+      (ruby-refactor-stop))))
 
 (provide 'ruby-refactor)
