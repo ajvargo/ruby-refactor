@@ -238,7 +238,8 @@ If a region is not selected, the transformation uses the current line."
               (progn
                 (let* ((text-lines (ruby-refactor-trim-list (split-string text "\n")))
                        (variable-name (car (ruby-refactor-trim-list (split-string (car text-lines) " = "))))
-                       (faux-variable-name (concat ruby-refactor-let-prefix variable-name)))
+                       (faux-variable-name (concat ruby-refactor-let-prefix variable-name))
+                       (case-fold-search nil))
                   (insert (format "let :%s do" variable-name))
                   (mapc #'(lambda(line) (newline)
                             (insert (replace-regexp-in-string variable-name faux-variable-name line)))
