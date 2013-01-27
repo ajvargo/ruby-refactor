@@ -325,6 +325,9 @@ If a region is not selected, the transformation uses the current line."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Official setup and the like
+(defun ruby-refactor-mode-launch ()
+  (ruby-refactor-mode 1))
+
 (defun ruby-refactor-start ()
   (use-local-map ruby-refactor-mode-map)
   (message "Ruby-Refactor mode enabled"))
@@ -352,5 +355,7 @@ If a region is not selected, the transformation uses the current line."
     (progn
       (use-local-map nil)
       (ruby-refactor-stop))))
+
+(add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
 
 (provide 'ruby-refactor)
