@@ -99,6 +99,11 @@
   :version "0.1"
   :group 'files)
 
+(defcustom ruby-refactor-let-prefix ""
+  "Prefix to use when extracting a region to let"
+  :group 'ruby-refactor
+  :type 'string
+)
 
 (defcustom ruby-refactor-add-parens nil
   "Add parens when adding a parameters to a function. Will be converted if params already exist"
@@ -233,7 +238,7 @@ If a region is not selected, the transformation uses the current line."
               (progn
                 (let* ((text-lines (ruby-refactor-trim-list (split-string text "\n")))
                        (variable-name (car (ruby-refactor-trim-list (split-string (car text-lines) " = "))))
-                       (faux-variable-name (concat "_" variable-name)))
+                       (faux-variable-name (concat ruby-refactor-let-prefix variable-name)))
                   (insert (format "let :%s do" variable-name))
                   (mapc #'(lambda(line) (newline)
                             (insert (replace-regexp-in-string variable-name faux-variable-name line)))
