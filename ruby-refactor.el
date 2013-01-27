@@ -93,6 +93,7 @@
 (defvar ruby-refactor-mode-map (make-sparse-keymap)
   "Keymap to use in ruby refactor minor mode.")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Customizations
 (defgroup ruby-refactor nil
   "Refactoring helpers for Ruby."
@@ -111,13 +112,13 @@
   :type 'boolean
   )
 
-(defcustom ruby-refactor-trim-regexp "[ \t\n\(\)]*"
+(defcustom ruby-refactor-trim-re "[ \t\n\(\)]*"
   "Regex to use for trim functions. Will be applied to both front and back of string"
   :group 'ruby-refactor
   :type 'string
 )
 
-(defcustom ruby-refactor-let-placement-regexp "^[ \t]*\\(describe\\|context\\)"
+(defcustom ruby-refactor-let-placement-re "^[ \t]*\\(describe\\|context\\)"
   "Regex searched for to determine where to put let statemement.
 See `ruby-refactor-let-position' to specify proximity to assignment
 being altered."
@@ -132,11 +133,24 @@ most recent context or describe.  'top (default) places it after
   :type '(choice (const :tag "place top-most" top)
                  (const :tag "place closest" closest)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Helper functions
+(defun ruby-refactor-line-contains-equal-p (line)
+  "Returns if line contains an '='"
+  (string-match "=" line))
+
+(defun ruby-refactor-line-has-let-p ()
+  "Returns if line contains 'let('"
+  (string-match "let(" (thing-at-point 'line)))
+
 (defun ruby-refactor-trim-string (string)
   "Trims text from both front and back of a string"
-   (replace-regexp-in-string (concat ruby-refactor-trim-regexp "$") ""
-                             (replace-regexp-in-string (concat "^" ruby-refactor-trim-regexp) "" string)))
+   (replace-regexp-in-string (concat ruby-refactor-trim-re "$") ""
+                             (replace-regexp-in-string (concat "^" ruby-refactor-trim-re) "" string)))
+
+(defun ruby-refactor-trim-newline-endings (string)
+  "Trims newline off front and back of string"
+  (replace-regexp-in-string "\\(^\n\\|\n$\\)" "" string))
 
 (defun ruby-refactor-trim-list (list)
   "Applies `ruby-refactor-trim-string' to each item in list, and returns newly trimmed list"
@@ -145,6 +159,24 @@ most recent context or describe.  'top (default) places it after
 (defun ruby-refactor-goto-def-start ()
   "Moves point to start of first def to appear previously "
   (search-backward-regexp "^\\s *def"))
+
+(defun ruby-refactor-goto-first-non-let-line ()
+  "Place point at beginning of first non let( containing line"
+  (while (ruby-refactor-line-has-let-p)
+    (forward-line 1)))
+
+
+(defun ruby-refactor-jump-to-let-insert-point (flip-location)
+  "Positions point at the proper place for inserting let.
+This depends the value of `ruby-refactor-let-position'"
+  (let ((position-test (if (null flip-location)
+                           #'(lambda(left right)(eq left right))
+                         #'(lambda(left right)(not (eq left right))))))
+    (cond ((funcall position-test 'top ruby-refactor-let-position)
+           (goto-char 0)
+           (search-forward-regexp ruby-refactor-let-placement-re))
+          ((funcall position-test 'closest ruby-refactor-let-position)
+           (search-backward-regexp ruby-refactor-let-placement-re)))))
 
 (defun ruby-refactor-get-input-with-default (prompt default-value)
   "Gets user input with a default value"
@@ -159,14 +191,64 @@ most recent context or describe.  'top (default) places it after
         (format "(%s)" param-list)
       (format " %s" param-list))))
 
-(defun ruby-refactor-goto-first-non-let-line ()
-  "Place point at beginning of first non let( containing line"
-  (while (ruby-refactor-line-has-let-p)
-    (forward-line 1)))
+(defun ruby-refactor-assignement-error-message ()
+  "Message user with error if the (first) line of a let
+extraction is missing."
+  (message "First line needs to have an assigment"))
 
-(defun ruby-refactor-line-has-let-p ()
-  (string-match "let(" (thing-at-point 'line)))
+(defun ruby-refactor-extract-line-to-let (flip-location)
+  "Extracts current line to let."
+  (let* ((line-bounds (bounds-of-thing-at-point 'line))
+         (text-begin (car line-bounds))
+         (text-end (cdr line-bounds))
+         (text (ruby-refactor-trim-newline-endings (buffer-substring-no-properties text-begin text-end)))
+         (line-components (ruby-refactor-trim-list (split-string text " = "))))
+    (if (ruby-refactor-line-contains-equal-p text)
+        (progn
+          (delete-region text-begin text-end)
+          (ruby-refactor-jump-to-let-insert-point flip-location)
+          (forward-line 1)
+          (ruby-refactor-goto-first-non-let-line)
+          (ruby-indent-line)
+          (insert (format "let(:%s){ %s }" (car line-components) (cadr line-components)))
+          (newline-and-indent)
+          (beginning-of-line)
+          (unless (looking-at "^[ \t]*$") (newline-and-indent))
+          (delete-blank-lines))
+      (ruby-refactor-assignement-error-message))))
 
+(defun ruby-refactor-extract-region-to-let (flip-location)
+  "Extracts current region to let."
+  (let* ((text-begin (region-beginning))
+        (text-end (region-end))
+        (text (ruby-refactor-trim-newline-endings (buffer-substring-no-properties text-begin text-end)))
+        (text-lines (ruby-refactor-trim-list (split-string text "\n"))))
+        (if (ruby-refactor-line-contains-equal-p (car text-lines))
+            (let* ((variable-name (car (ruby-refactor-trim-list (split-string (car text-lines) " = "))))
+                  (faux-variable-name (concat ruby-refactor-let-prefix variable-name))
+                  (case-fold-search nil))
+              (delete-region text-begin text-end)
+              (ruby-refactor-jump-to-let-insert-point flip-location)
+              (forward-line 1)
+              (ruby-refactor-goto-first-non-let-line)
+              (ruby-indent-line)
+              (insert (format "let :%s do" variable-name))
+              (mapc #'(lambda(line)
+              (newline)
+              (insert (replace-regexp-in-string variable-name faux-variable-name line)))
+                    text-lines)
+              (insert "\n" faux-variable-name "\n" "end")
+              (newline-and-indent)
+              (search-backward "let")
+              (ruby-indent-exp)
+              (search-forward "end")
+              (newline-and-indent)
+              (beginning-of-line)
+              (unless (looking-at "^[ \t]*$") (newline-and-indent))
+              (delete-blank-lines))
+          (ruby-refactor-assignement-error-message))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; API
 (defun ruby-refactor-extract-to-method (region-start region-end)
   "Extracts region to method"
@@ -174,7 +256,7 @@ most recent context or describe.  'top (default) places it after
   (save-restriction
     (save-match-data
       (widen)
-      (let ((function-guts (buffer-substring-no-properties region-start region-end))
+      (let ((function-guts (ruby-refactor-trim-newline-endings (buffer-substring-no-properties region-start region-end)))
             (function-name (read-from-minibuffer "Method name? ")))
         (delete-region region-start region-end)
         (ruby-indent-line)
@@ -216,47 +298,9 @@ If a region is not selected, the transformation uses the current line."
     (save-restriction
       (save-match-data
         (widen)
-        (let (text-begin text-end text)
-          (if (region-active-p)
-              (setq text-begin (region-beginning) text-end (region-end))
-            (setq text-begin (car (bounds-of-thing-at-point 'line)) text-end (cdr (bounds-of-thing-at-point 'line))))
-          (setq text (buffer-substring-no-properties text-begin text-end))
-
-          (delete-region text-begin text-end)
-          (let ((position-test (if (null flip-location)
-                                   #'(lambda(left right)(eq left right))
-                                 #'(lambda(left right)(not (eq left right))))))
-            (cond ((funcall position-test 'top ruby-refactor-let-position)
-                   (goto-char 0)
-                   (search-forward-regexp ruby-refactor-let-placement-regexp))
-                  ((funcall position-test 'closest ruby-refactor-let-position)
-                   (search-backward-regexp ruby-refactor-let-placement-regexp))))
-          (forward-line 1)
-          (ruby-refactor-goto-first-non-let-line)
-          (ruby-indent-line)
-          (if (region-active-p)
-              (progn
-                (let* ((text-lines (ruby-refactor-trim-list (split-string text "\n")))
-                       (variable-name (car (ruby-refactor-trim-list (split-string (car text-lines) " = "))))
-                       (faux-variable-name (concat ruby-refactor-let-prefix variable-name))
-                       (case-fold-search nil))
-                  (insert (format "let :%s do" variable-name))
-                  (mapc #'(lambda(line) (newline)
-                            (insert (replace-regexp-in-string variable-name faux-variable-name line)))
-                        text-lines)
-                  (insert "\n" faux-variable-name "\n" "end")
-                  (newline-and-indent)
-                  (search-backward "let")
-                  (ruby-indent-exp)
-                  (search-forward "end")))
-            (progn
-              (let ((line-components (ruby-refactor-trim-list (split-string text " = "))))
-                (insert (format "let(:%s){ %s }" (car line-components) (cadr line-components))))))
-          (newline-and-indent)
-          (beginning-of-line)
-          (unless (looking-at "^[ \t]*$") (newline-and-indent))))))
-  (delete-blank-lines)
-  )
+        (if (region-active-p)
+            (ruby-refactor-extract-region-to-let flip-location)
+          (ruby-refactor-extract-line-to-let flip-location))))))
 
 (defun ruby-refactor-extract-local-variable()
   "Extracts selected text to local variable"
