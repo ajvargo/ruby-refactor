@@ -1,9 +1,9 @@
 (let* ((current-directory (file-name-directory load-file-name))
        (features-directory (expand-file-name ".." current-directory))
        (project-directory (expand-file-name ".." features-directory)))
-  (setq expand-region-root-path project-directory))
+  (setq ruby-refactor-root-path project-directory))
 
-(add-to-list 'load-path expand-region-root-path)
+(add-to-list 'load-path ruby-refactor-root-path)
 
 (require 'ruby-refactor)
 (require 'espuds)
