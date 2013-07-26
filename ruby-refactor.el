@@ -268,10 +268,12 @@ extraction is missing."
         (ruby-indent-line)
         (insert function-name)
         (ruby-refactor-goto-def-start)
-        (insert "\tdef " function-name "\n" function-guts "\nend\n\n")
+        (insert "def " function-name "\n" function-guts "\nend\n\n")
         (ruby-refactor-goto-def-start)
-        (ruby-indent-exp)
-        (ruby-forward-sexp)
+        (indent-region (point)
+                       (progn
+                         (forward-paragraph)
+                         (point)))
         (search-forward function-name)
         ))))
 
