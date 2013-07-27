@@ -278,7 +278,7 @@ extraction is missing."
                          (forward-paragraph)
                          (point)))
         (search-forward function-name)
-        (backward-word)
+        (backward-sexp)
         ))))
 
 (defun ruby-refactor-add-parameter (variable-name)
@@ -317,7 +317,21 @@ If a region is not selected, the transformation uses the current line."
 (defun ruby-refactor-extract-local-variable()
   "Extracts selected text to local variable"
   (interactive)
-  (message "Not Yet Implmented"))
+  (save-restriction
+    (save-match-data
+      (widen)
+      (let* ((text-begin (region-beginning))
+             (text-end (region-end))
+             (text (ruby-refactor-trim-newline-endings (buffer-substring-no-properties text-begin text-end)))
+             (variable-name (read-from-minibuffer "Variable name? ")))
+        (delete-region text-begin text-end)
+        (insert variable-name)
+        (beginning-of-line)
+        (open-line 1)
+        (ruby-indent-line)
+        (insert variable-name " = " text)
+        (search-forward variable-name)
+        (backward-sexp)))))
 
 (defun ruby-refactor-remove-inline-temp()
   "Replaces temporary variable with direct call to method"
@@ -345,7 +359,8 @@ If a region is not selected, the transformation uses the current line."
   (setq ruby-refactor-mode-map (make-sparse-keymap))
   (define-key ruby-refactor-mode-map (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
   (define-key ruby-refactor-mode-map (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
-  (define-key ruby-refactor-mode-map (kbd "C-c C-r l") 'ruby-refactor-extract-to-let))
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable))
 
 (define-minor-mode ruby-refactor-mode
   "Ruby Refactor minor mode"
