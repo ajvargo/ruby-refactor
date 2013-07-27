@@ -3,11 +3,11 @@
 Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby, currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
 I've implemented 5 refactorings
- - Extract to Method
- - Extract Local Variable
- - Extract Constant
- - Add Parameter
- - Extract to Let
+ - Extract to Method  (C-c C-r e)
+ - Extract Local Variable  (C-c C-r v)
+ - Extract Constant  (C-c C-r c)
+ - Add Parameter  (C-c C-r p)
+ - Extract to Let  (C-c C-r l)
 
 # Install
 Add ruby-refactor.el to you load path.
