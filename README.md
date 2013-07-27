@@ -2,7 +2,7 @@
 
 Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby, currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-I've implemented 4 refactorings
+I've implemented 5 refactorings
  - Extract to Method
  - Extract Local Variable
  - Extract Constant
