@@ -4,6 +4,9 @@
 
 ;; Author: Andrew J Vargo <ajvargo@gmail.com>
 ;; Keywords: refactor ruby
+;; Version: 0.1
+;; URL: https://github.com/ajvargo/ruby-refactor
+;; Package-Requires: ((ruby-mode "1.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -361,3 +364,5 @@ If a region is not selected, the transformation uses the current line."
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
 
 (provide 'ruby-refactor)
+
+;;; ruby-refactor.el ends here
