@@ -275,9 +275,10 @@ extraction is missing."
         (ruby-refactor-goto-def-start)
         (indent-region (point)
                        (progn
-                         (ruby-end-of-defun)
+                         (forward-paragraph)
                          (point)))
         (search-forward function-name)
+        (backward-word)
         ))))
 
 (defun ruby-refactor-add-parameter (variable-name)
