@@ -26,8 +26,9 @@
 ;; Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby,
 ;; currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-;; I've implemented 3 refactorings
+;; I've implemented 4 refactorings
 ;;  - Extract to Method
+;;  - Extract Local Variable
 ;;  - Add Parameter
 ;;  - Extract to Let
 
@@ -42,6 +43,11 @@
 ;; above the method you are in with the method contents being the
 ;; selected region. The region will be replaced w/ a call to method.
 
+;; ## Extract Local Variable:
+;; Select a region o text and invoke `ruby-refactor-extract-local-variable`.
+;; You'll be prompted for a variable name.  The new variable will
+;; be created directly above the selected region and the region
+;; will be replaced with the variable.
 
 ;; ## Add Parameter:
 ;; 'ruby-refactor-add-parameter'
@@ -88,7 +94,6 @@
 
 ;; ## TODO
 ;; From the vim plugin, these remain to be done (I don't plan to do them all.)
-;;  - extract local variable
 ;;  - remove inline temp (sexy!)
 ;;  - convert post conditional
 
