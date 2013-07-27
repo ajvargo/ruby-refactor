@@ -275,7 +275,7 @@ extraction is missing."
         (ruby-refactor-goto-def-start)
         (indent-region (point)
                        (progn
-                         (forward-paragraph)
+                         (ruby-end-of-defun)
                          (point)))
         (search-forward function-name)
         ))))
