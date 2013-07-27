@@ -26,9 +26,10 @@
 ;; Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby,
 ;; currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-;; I've implemented 4 refactorings
+;; I've implemented 5 refactorings
 ;;  - Extract to Method
 ;;  - Extract Local Variable
+;;  - Extract Constant
 ;;  - Add Parameter
 ;;  - Extract to Let
 
@@ -44,10 +45,17 @@
 ;; selected region. The region will be replaced w/ a call to method.
 
 ;; ## Extract Local Variable:
-;; Select a region o text and invoke `ruby-refactor-extract-local-variable`.
+;; Select a region of text and invoke `ruby-refactor-extract-local-variable`.
 ;; You'll be prompted for a variable name.  The new variable will
 ;; be created directly above the selected region and the region
 ;; will be replaced with the variable.
+
+;; ## Extract Constant:
+;; Select a region of text and invoke `ruby-refactor-extract-contant`.
+;; You'll be prompted for a constant name.  The new constant will
+;; be created at the top of the enclosing class or module directly
+;; after any include or extend statements and the regions will be
+;; replaced with the constant.
 
 ;; ## Add Parameter:
 ;; 'ruby-refactor-add-parameter'
@@ -179,6 +187,13 @@ most recent context or describe.  'top (default) places it after
   (while (ruby-refactor-line-has-let-p)
     (forward-line 1)))
 
+(defun ruby-refactor-goto-constant-insertion-point ()
+  "Moves point to the proper location to insert a constant at the top of a class or module"
+  (search-backward-regexp "^ *\\<class\\|^ *module\\>")
+  (next-line)
+  (while (or (string-match "include" (thing-at-point 'line))
+             (string-match "extend" (thing-at-point 'line)))
+    (next-line)))
 
 (defun ruby-refactor-jump-to-let-insert-point (flip-location)
   "Positions point at the proper place for inserting let.
@@ -338,6 +353,27 @@ If a region is not selected, the transformation uses the current line."
         (search-forward variable-name)
         (backward-sexp)))))
 
+(defun ruby-refactor-extract-constant()
+  "Extracts selected text to a constant at the top of the current class or module"
+  (interactive)
+  (save-restriction
+    (save-match-data
+      (widen)
+      (let* ((text-begin (region-beginning))
+             (text-end (region-end))
+             (text (ruby-refactor-trim-newline-endings (buffer-substring-no-properties text-begin text-end)))
+             (constant-name (read-from-minibuffer "Constant name? ")))
+        (delete-region text-begin text-end)
+        (insert constant-name)
+        (ruby-refactor-goto-constant-insertion-point)
+        (beginning-of-line)
+        (open-line 2)
+        (next-line)
+        (ruby-indent-line)
+        (insert constant-name " = " text "\n")
+        (search-forward constant-name)
+        (backward-sexp)))))
+
 (defun ruby-refactor-remove-inline-temp()
   "Replaces temporary variable with direct call to method"
   (interactive)
@@ -365,7 +401,8 @@ If a region is not selected, the transformation uses the current line."
   (define-key ruby-refactor-mode-map (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
   (define-key ruby-refactor-mode-map (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
   (define-key ruby-refactor-mode-map (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
-  (define-key ruby-refactor-mode-map (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable))
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable)
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r c") 'ruby-refactor-extract-constant))
 
 (define-minor-mode ruby-refactor-mode
   "Ruby Refactor minor mode"
