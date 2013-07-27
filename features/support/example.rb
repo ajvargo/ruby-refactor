@@ -23,3 +23,15 @@ module Outer
     end
   end
 end
+
+
+describe "TestSubject" do
+
+  context "the first context" do
+    before(:each) do
+      mock_advertiser_one = mock_model(Advertiser)
+      mock_advertiser_one.stub(:uid).and_return("UID1")
+    end
+  end
+
+end

@@ -109,7 +109,7 @@
   :type 'boolean
   )
 
-(defcustom ruby-refactor-trim-re "[ \t\n\(\)]*"
+(defcustom ruby-refactor-trim-re "[ \t\n]*"
   "Regex to use for trim functions. Will be applied to both front and back of string"
   :group 'ruby-refactor
   :type 'string
