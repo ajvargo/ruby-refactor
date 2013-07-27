@@ -5,6 +5,7 @@ Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby, currently foun
 I've implemented 4 refactorings
  - Extract to Method
  - Extract Local Variable
+ - Extract Constant
  - Add Parameter
  - Extract to Let
 
@@ -29,6 +30,13 @@ Select a region o text and invoke `ruby-refactor-extract-local-variable`.
 You'll be prompted for a variable name.  The new variable will
 be created directly above the selected region and the region
 will be replaced with the variable.
+
+## Extract Constant:
+Select a region of text and invoke `ruby-refactor-extract-contant`.
+You'll be prompted for a constant name.  The new constant will
+be created at the top of the enclosing class or module directly
+after any include or extend statements and the regions will be
+replaced with the constant.
 
 ## Add Parameter:
 `ruby-refactor-add-parameter`
