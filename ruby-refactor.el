@@ -219,7 +219,7 @@ extraction is missing."
           (forward-line 1)
           (ruby-refactor-goto-first-non-let-line)
           (ruby-indent-line)
-          (insert (format "let(:%s){ %s }" (car line-components) (cadr line-components)))
+          (insert (format "let(:%s){ %s }\n" (car line-components) (cadr line-components)))
           (newline-and-indent)
           (beginning-of-line)
           (unless (looking-at "^[ \t]*$") (newline-and-indent))

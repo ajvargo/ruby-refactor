@@ -25,4 +25,17 @@ Feature: The ruby-refactor-extract-to_let function
   end
 """
 
+  Scenario: Should have newline after let with extracting line
+    When I go to the front of the word "mock_model"
+    And I start an action chain
+    And I press "C-c C-r l"
+    And I type "the_new_method"
+    And I execute the action chain
+    Then I should see:
+"""
+  let(:mock_advertiser_one){ mock_model(Advertiser) }
+  
+  context "the first context" do
+"""
+
   
