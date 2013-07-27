@@ -13,6 +13,7 @@
  (global-set-key (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
  (global-set-key (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
  (global-set-key (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
+ (global-set-key (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable)
  (switch-to-buffer
   (get-buffer-create "*ruby-refactor*"))
  (erase-buffer)
