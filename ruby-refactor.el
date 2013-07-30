@@ -165,6 +165,11 @@ most recent context or describe.  'top (default) places it after
   "Returns if line contains 'let('"
   (string-match "let(" (thing-at-point 'line)))
 
+(defun ruby-refactor-ends-with-newline-p (region-start region-end)
+  "Returns if the last character is a newline ignoring trailing spaces"
+  (let ((text (replace-regexp-in-string " *$" "" (buffer-substring-no-properties region-start region-end))))
+    (string-match "\n" (substring text -1))))
+
 (defun ruby-refactor-trim-string (string)
   "Trims text from both front and back of a string"
    (replace-regexp-in-string (concat ruby-refactor-trim-re "$") ""
@@ -285,11 +290,17 @@ extraction is missing."
   (save-restriction
     (save-match-data
       (widen)
-      (let ((function-guts (ruby-refactor-trim-newline-endings (buffer-substring-no-properties region-start region-end)))
+      (let ((ends-with-newline (ruby-refactor-ends-with-newline-p region-start region-end))
+            (function-guts (ruby-refactor-trim-newline-endings (buffer-substring-no-properties region-start region-end)))
             (function-name (read-from-minibuffer "Method name? ")))
         (delete-region region-start region-end)
         (ruby-indent-line)
         (insert function-name)
+        (if ends-with-newline
+            (progn
+              (ruby-indent-line)
+              (insert "\n")
+              (ruby-indent-line)))
         (ruby-refactor-goto-def-start)
         (insert "def " function-name "\n" function-guts "\nend\n\n")
         (ruby-refactor-goto-def-start)
