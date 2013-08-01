@@ -2,10 +2,12 @@
 
 Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby, currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-I've implemented 3 refactorings
- - Extract to Method
- - Add Parameter
- - Extract to Let
+I've implemented 5 refactorings
+ - Extract to Method  (C-c C-r e)
+ - Extract Local Variable  (C-c C-r v)
+ - Extract Constant  (C-c C-r c)
+ - Add Parameter  (C-c C-r p)
+ - Extract to Let  (C-c C-r l)
 
 # Install
 Add ruby-refactor.el to you load path.
@@ -23,6 +25,18 @@ You'll be prompted for a method name. The method will be created
 above the method you are in with the method contents being the
 selected region. The region will be replaced w/ a call to method.
 
+## Extract Local Variable:
+Select a region o text and invoke `ruby-refactor-extract-local-variable`.
+You'll be prompted for a variable name.  The new variable will
+be created directly above the selected region and the region
+will be replaced with the variable.
+
+## Extract Constant:
+Select a region of text and invoke `ruby-refactor-extract-contant`.
+You'll be prompted for a constant name.  The new constant will
+be created at the top of the enclosing class or module directly
+after any include or extend statements and the regions will be
+replaced with the constant.
 
 ## Add Parameter:
 `ruby-refactor-add-parameter`
@@ -83,7 +97,6 @@ it closest.  I kinda got nutty with this one.
 
 ## TODO
 From the vim plugin, these remain to be done (I don't plan to do them all.)
- - extract local variable
  - remove inline temp (sexy!)
  - convert post conditional
 

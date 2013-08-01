@@ -4,6 +4,9 @@
 
 ;; Author: Andrew J Vargo <ajvargo@gmail.com>
 ;; Keywords: refactor ruby
+;; Version: 0.1
+;; URL: https://github.com/ajvargo/ruby-refactor
+;; Package-Requires: ((ruby-mode "1.2"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -23,8 +26,10 @@
 ;; Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby,
 ;; currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-;; I've implemented 3 refactorings
+;; I've implemented 5 refactorings
 ;;  - Extract to Method
+;;  - Extract Local Variable
+;;  - Extract Constant
 ;;  - Add Parameter
 ;;  - Extract to Let
 
@@ -39,6 +44,18 @@
 ;; above the method you are in with the method contents being the
 ;; selected region. The region will be replaced w/ a call to method.
 
+;; ## Extract Local Variable:
+;; Select a region of text and invoke `ruby-refactor-extract-local-variable`.
+;; You'll be prompted for a variable name.  The new variable will
+;; be created directly above the selected region and the region
+;; will be replaced with the variable.
+
+;; ## Extract Constant:
+;; Select a region of text and invoke `ruby-refactor-extract-contant`.
+;; You'll be prompted for a constant name.  The new constant will
+;; be created at the top of the enclosing class or module directly
+;; after any include or extend statements and the regions will be
+;; replaced with the constant.
 
 ;; ## Add Parameter:
 ;; 'ruby-refactor-add-parameter'
@@ -85,7 +102,6 @@
 
 ;; ## TODO
 ;; From the vim plugin, these remain to be done (I don't plan to do them all.)
-;;  - extract local variable
 ;;  - remove inline temp (sexy!)
 ;;  - convert post conditional
 
@@ -109,7 +125,7 @@
   :type 'boolean
   )
 
-(defcustom ruby-refactor-trim-re "[ \t\n\(\)]*"
+(defcustom ruby-refactor-trim-re "[ \t\n]*"
   "Regex to use for trim functions. Will be applied to both front and back of string"
   :group 'ruby-refactor
   :type 'string
@@ -149,6 +165,11 @@ most recent context or describe.  'top (default) places it after
   "Returns if line contains 'let('"
   (string-match "let(" (thing-at-point 'line)))
 
+(defun ruby-refactor-ends-with-newline-p (region-start region-end)
+  "Returns if the last character is a newline ignoring trailing spaces"
+  (let ((text (replace-regexp-in-string " *$" "" (buffer-substring-no-properties region-start region-end))))
+    (string-match "\n" (substring text -1))))
+
 (defun ruby-refactor-trim-string (string)
   "Trims text from both front and back of a string"
    (replace-regexp-in-string (concat ruby-refactor-trim-re "$") ""
@@ -171,6 +192,13 @@ most recent context or describe.  'top (default) places it after
   (while (ruby-refactor-line-has-let-p)
     (forward-line 1)))
 
+(defun ruby-refactor-goto-constant-insertion-point ()
+  "Moves point to the proper location to insert a constant at the top of a class or module"
+  (search-backward-regexp "^ *\\<class\\|^ *module\\>")
+  (next-line)
+  (while (or (string-match "include" (thing-at-point 'line))
+             (string-match "extend" (thing-at-point 'line)))
+    (next-line)))
 
 (defun ruby-refactor-jump-to-let-insert-point (flip-location)
   "Positions point at the proper place for inserting let.
@@ -216,7 +244,7 @@ extraction is missing."
           (forward-line 1)
           (ruby-refactor-goto-first-non-let-line)
           (ruby-indent-line)
-          (insert (format "let(:%s){ %s }" (car line-components) (cadr line-components)))
+          (insert (format "let(:%s){ %s }\n" (car line-components) (cadr line-components)))
           (newline-and-indent)
           (beginning-of-line)
           (unless (looking-at "^[ \t]*$") (newline-and-indent))
@@ -262,17 +290,26 @@ extraction is missing."
   (save-restriction
     (save-match-data
       (widen)
-      (let ((function-guts (ruby-refactor-trim-newline-endings (buffer-substring-no-properties region-start region-end)))
+      (let ((ends-with-newline (ruby-refactor-ends-with-newline-p region-start region-end))
+            (function-guts (ruby-refactor-trim-newline-endings (buffer-substring-no-properties region-start region-end)))
             (function-name (read-from-minibuffer "Method name? ")))
         (delete-region region-start region-end)
         (ruby-indent-line)
         (insert function-name)
+        (if ends-with-newline
+            (progn
+              (ruby-indent-line)
+              (insert "\n")
+              (ruby-indent-line)))
         (ruby-refactor-goto-def-start)
-        (insert "\tdef " function-name "\n" function-guts "\nend\n\n")
+        (insert "def " function-name "\n" function-guts "\nend\n\n")
         (ruby-refactor-goto-def-start)
-        (ruby-indent-exp)
-        (ruby-forward-sexp)
+        (indent-region (point)
+                       (progn
+                         (forward-paragraph)
+                         (point)))
         (search-forward function-name)
+        (backward-sexp)
         ))))
 
 (defun ruby-refactor-add-parameter (variable-name)
@@ -311,7 +348,42 @@ If a region is not selected, the transformation uses the current line."
 (defun ruby-refactor-extract-local-variable()
   "Extracts selected text to local variable"
   (interactive)
-  (message "Not Yet Implmented"))
+  (save-restriction
+    (save-match-data
+      (widen)
+      (let* ((text-begin (region-beginning))
+             (text-end (region-end))
+             (text (ruby-refactor-trim-newline-endings (buffer-substring-no-properties text-begin text-end)))
+             (variable-name (read-from-minibuffer "Variable name? ")))
+        (delete-region text-begin text-end)
+        (insert variable-name)
+        (beginning-of-line)
+        (open-line 1)
+        (ruby-indent-line)
+        (insert variable-name " = " text)
+        (search-forward variable-name)
+        (backward-sexp)))))
+
+(defun ruby-refactor-extract-constant()
+  "Extracts selected text to a constant at the top of the current class or module"
+  (interactive)
+  (save-restriction
+    (save-match-data
+      (widen)
+      (let* ((text-begin (region-beginning))
+             (text-end (region-end))
+             (text (ruby-refactor-trim-newline-endings (buffer-substring-no-properties text-begin text-end)))
+             (constant-name (read-from-minibuffer "Constant name? ")))
+        (delete-region text-begin text-end)
+        (insert constant-name)
+        (ruby-refactor-goto-constant-insertion-point)
+        (beginning-of-line)
+        (open-line 2)
+        (next-line)
+        (ruby-indent-line)
+        (insert constant-name " = " text "\n")
+        (search-forward constant-name)
+        (backward-sexp)))))
 
 (defun ruby-refactor-remove-inline-temp()
   "Replaces temporary variable with direct call to method"
@@ -339,7 +411,9 @@ If a region is not selected, the transformation uses the current line."
   (setq ruby-refactor-mode-map (make-sparse-keymap))
   (define-key ruby-refactor-mode-map (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
   (define-key ruby-refactor-mode-map (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
-  (define-key ruby-refactor-mode-map (kbd "C-c C-r l") 'ruby-refactor-extract-to-let))
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable)
+  (define-key ruby-refactor-mode-map (kbd "C-c C-r c") 'ruby-refactor-extract-constant))
 
 (define-minor-mode ruby-refactor-mode
   "Ruby Refactor minor mode"
@@ -359,3 +433,5 @@ If a region is not selected, the transformation uses the current line."
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
 
 (provide 'ruby-refactor)
+
+;;; ruby-refactor.el ends here
