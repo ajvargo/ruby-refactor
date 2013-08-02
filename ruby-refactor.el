@@ -195,10 +195,10 @@ most recent context or describe.  'top (default) places it after
 (defun ruby-refactor-goto-constant-insertion-point ()
   "Moves point to the proper location to insert a constant at the top of a class or module"
   (search-backward-regexp "^ *\\<class\\|^ *module\\>")
-  (next-line)
+  (forward-line)
   (while (or (string-match "include" (thing-at-point 'line))
              (string-match "extend" (thing-at-point 'line)))
-    (next-line)))
+    (forward-line)))
 
 (defun ruby-refactor-jump-to-let-insert-point (flip-location)
   "Positions point at the proper place for inserting let.
@@ -379,7 +379,7 @@ If a region is not selected, the transformation uses the current line."
         (ruby-refactor-goto-constant-insertion-point)
         (beginning-of-line)
         (open-line 2)
-        (next-line)
+        (forward-line)
         (ruby-indent-line)
         (insert constant-name " = " text "\n")
         (search-forward constant-name)
