@@ -10,11 +10,19 @@ I've implemented 5 refactorings
  - Extract to Let  (C-c C-r l)
 
 # Install
-Add ruby-refactor.el to you load path.
-Then:
+To install manually, add ruby-refactor.el to your load path, then:
 
 ```lisp
 (require 'ruby-refactor)
+```
+
+Alternatively, simply install the `ruby-refactor` package from
+Marmalade or [MELPA](http://melpa.milkbox.net).
+
+In both cases, you must enable `ruby-refactor-minor-mode` in `ruby-mode`:
+
+```lisp
+(add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
 ```
 
 # Usage
@@ -23,7 +31,7 @@ Then:
 Select a region of text and invoke `ruby-refactor-extract-to-method`.
 You'll be prompted for a method name. The method will be created
 above the method you are in with the method contents being the
-selected region. The region will be replaced w/ a call to method.
+selected region. The region will be replaced with a call to method.
 
 ## Extract Local Variable:
 Select a region o text and invoke `ruby-refactor-extract-local-variable`.
