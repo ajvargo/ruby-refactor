@@ -112,7 +112,7 @@ From the vim plugin, these remain to be done (I don't plan to do them all.)
 # License
 Copyright (C) 2013 Andrew J Vargo
 
-Author: Andrew J Vargo <ajvargo@computer.org>
+Authors: Andrew J Vargo <ajvargo@computer.org>, Jeff Morgan <jeff.morgan@leandog.com>
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

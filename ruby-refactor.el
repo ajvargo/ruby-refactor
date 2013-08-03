@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2013 Andrew J Vargo
 
-;; Author: Andrew J Vargo <ajvargo@gmail.com>
+;; Authors: Andrew J Vargo <ajvargo@gmail.com>, Jeff Morgan <jeff.morgan@leandog.com>
 ;; Keywords: refactor ruby
 ;; Version: 0.1
 ;; URL: https://github.com/ajvargo/ruby-refactor
