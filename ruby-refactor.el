@@ -405,15 +405,14 @@ If a region is not selected, the transformation uses the current line."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Official setup and the like
-(defvar ruby-reactor-mode-map
-  (let ((m (make-sparse-keymap)))
-    (define-key m (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
-    (define-key m (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
-    (define-key m (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
-    (define-key m (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable)
-    (define-key m (kbd "C-c C-r c") 'ruby-refactor-extract-constant)
-    m)
-  "Keymap for `ruby-reactor-mode'.")
+(when (not ruby-refactor-mode-map)
+  (let ((keymap (make-sparse-keymap)))
+    (define-key keymap (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
+    (define-key keymap (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
+    (define-key keymap (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
+    (define-key keymap (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable)
+    (define-key keymap (kbd "C-c C-r c") 'ruby-refactor-extract-constant)
+    (setq ruby-refactor-mode-map keymap)))
 
 ;;;###autoload
 (define-minor-mode ruby-refactor-mode
