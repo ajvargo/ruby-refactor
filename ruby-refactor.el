@@ -147,10 +147,24 @@ being altered."
   :type '(choice (const :tag "place top-most" top)
                  (const :tag "place closest" closest)))
 
+(defcustom ruby-refactor-keymap-prefix (kbd "C-c C-r")
+  "ruby-refactor keymap prefix."
+  :group 'ruby-refactor
+  :type 'sexp)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Vars
-(defvar ruby-refactor-mode-map nil
+
+(defvar ruby-refactor-mode-map
+  (let ((map (make-sparse-keymap)))
+    (let ((prefix-map (make-sparse-keymap)))
+      (define-key prefix-map (kbd "e") 'ruby-refactor-extract-to-method)
+      (define-key prefix-map (kbd "p") 'ruby-refactor-add-parameter)
+      (define-key prefix-map (kbd "l") 'ruby-refactor-extract-to-let)
+      (define-key prefix-map (kbd "v") 'ruby-refactor-extract-local-variable)
+      (define-key prefix-map (kbd "c") 'ruby-refactor-extract-constant)
+      (define-key map ruby-refactor-keymap-prefix prefix-map))
+    map)
   "Keymap to use in ruby refactor minor mode.")
 
 (defvar ruby-refactor-mode-hook nil
@@ -402,18 +416,6 @@ If a region is not selected, the transformation uses the current line."
   "Convert post conditional expression to conditional expression"
   (interactive)
   (error "Not Yet Implmented"))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; Official setup and the like
-(defvar ruby-reactor-mode-map
-  (let ((m (make-sparse-keymap)))
-    (define-key m (kbd "C-c C-r e") 'ruby-refactor-extract-to-method)
-    (define-key m (kbd "C-c C-r p") 'ruby-refactor-add-parameter)
-    (define-key m (kbd "C-c C-r l") 'ruby-refactor-extract-to-let)
-    (define-key m (kbd "C-c C-r v") 'ruby-refactor-extract-local-variable)
-    (define-key m (kbd "C-c C-r c") 'ruby-refactor-extract-constant)
-    m)
-  "Keymap for `ruby-reactor-mode'.")
 
 ;;;###autoload
 (define-minor-mode ruby-refactor-mode
