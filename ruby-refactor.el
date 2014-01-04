@@ -409,13 +409,13 @@ If a region is not selected, the transformation uses the current line."
 (defun ruby-refactor-remove-inline-temp()
   "Replaces temporary variable with direct call to method"
   (interactive)
-  (error "Not Yet Implmented"))
+  (error "Not Yet Implemented"))
 
 ;;;###autoload
 (defun ruby-refactor-convert-post-conditional()
   "Convert post conditional expression to conditional expression"
   (interactive)
-  (error "Not Yet Implmented"))
+  (error "Not Yet Implemented"))
 
 ;;;###autoload
 (define-minor-mode ruby-refactor-mode
