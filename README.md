@@ -29,9 +29,11 @@ In both cases, you must enable `ruby-refactor-minor-mode` in `ruby-mode`:
 
 ## Extract to Method:
 Select a region of text and invoke `ruby-refactor-extract-to-method`.
-You'll be prompted for a method name. The method will be created
-above the method you are in with the method contents being the
-selected region. The region will be replaced with a call to method.
+You'll be prompted for a method name and a new argument list. If your
+extracted method does not take parameters, leave it empty. The method
+will be created above the method you are in with the method contents
+being the selected region. The region will be replaced with a call to
+method.
 
 ## Extract Local Variable:
 Select a region o text and invoke `ruby-refactor-extract-local-variable`.
