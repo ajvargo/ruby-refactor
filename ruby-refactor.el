@@ -296,6 +296,18 @@ This depends the value of `ruby-refactor-let-position'."
               (delete-blank-lines))
           (ruby-refactor-assignement-error-message))))
 
+(defun ruby-refactor-define-extracted-method (function-name argument-list function-guts)
+  (concat "def " function-name
+          (if (string= "" (ruby-refactor-trim-string argument-list))
+              ""
+            (ruby-refactor-new-params "" argument-list))
+          "\n" function-guts "\nend\n\n"))
+
+(defun ruby-refactor-generate-function-call (function-name argument-list)
+  (if (string= "" (ruby-refactor-trim-string argument-list))
+      function-name
+      (format "%s(%s)" function-name argument-list)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; API
 
@@ -308,17 +320,18 @@ This depends the value of `ruby-refactor-let-position'."
       (widen)
       (let ((ends-with-newline (ruby-refactor-ends-with-newline-p region-start region-end))
             (function-guts (ruby-refactor-trim-newline-endings (buffer-substring-no-properties region-start region-end)))
-            (function-name (read-from-minibuffer "Method name? ")))
+            (function-name (read-from-minibuffer "Method name: "))
+            (argument-list (read-from-minibuffer "Argument list (empty if none): ")))
         (delete-region region-start region-end)
         (ruby-indent-line)
-        (insert function-name)
+        (insert (ruby-refactor-generate-function-call function-name argument-list))
         (if ends-with-newline
             (progn
               (ruby-indent-line)
               (insert "\n")
               (ruby-indent-line)))
         (ruby-refactor-goto-def-start)
-        (insert "def " function-name "\n" function-guts "\nend\n\n")
+        (insert (ruby-refactor-define-extracted-method function-name argument-list function-guts))
         (ruby-refactor-goto-def-start)
         (indent-region (point)
                        (progn
