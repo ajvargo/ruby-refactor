@@ -2,12 +2,13 @@
 
 Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby, currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-I've implemented 5 refactorings
+These are the refactorings available
  - Extract to Method  (C-c C-r e)
  - Extract Local Variable  (C-c C-r v)
  - Extract Constant  (C-c C-r c)
  - Add Parameter  (C-c C-r p)
  - Extract to Let  (C-c C-r l)
+ - Convert Post Conditional  (C-c C-r o)
 
 # Install
 To install manually, add ruby-refactor.el to your load path, then:
@@ -104,11 +105,28 @@ Oh, if you invoke with a prefix arg (`C-u`, etc.), it'll swap the placement
 of the let.  If you have location as top, a prefix argument will place
 it closest.  I kinda got nutty with this one.
 
+## Convert Post Conditional:
+Select a region of text and invoke `ruby-refactor-convert-post-conditional`.
+This simply moves the expression inside of an 'if' or 'unless' block.
+
+So this:
+
+```ruby
+do_some_stuff('blah') if condition
+```
+
+becomes
+
+```ruby
+if condition
+  do_some_stuff('blah')
+end
+```
+
 
 ## TODO
 From the vim plugin, these remain to be done (I don't plan to do them all.)
  - remove inline temp (sexy!)
- - convert post conditional
 
 
 # License
