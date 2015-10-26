@@ -240,7 +240,7 @@ This depends the value of `ruby-refactor-let-position'."
         (format "(%s)" param-list)
       (format " %s" param-list))))
 
-(defun ruby-refactor-assignement-error-message ()
+(defun ruby-refactor-assignment-error-message ()
   "Message user with error if the (first) line of a let extraction is missing."
   (message "First line needs to have an assigment"))
 
@@ -263,7 +263,7 @@ This depends the value of `ruby-refactor-let-position'."
           (beginning-of-line)
           (unless (looking-at "^[ \t]*$") (newline-and-indent))
           (delete-blank-lines))
-      (ruby-refactor-assignement-error-message))))
+      (ruby-refactor-assignment-error-message))))
 
 (defun ruby-refactor-extract-region-to-let (flip-location)
   "Extract current region to let."
@@ -294,7 +294,7 @@ This depends the value of `ruby-refactor-let-position'."
               (beginning-of-line)
               (unless (looking-at "^[ \t]*$") (newline-and-indent))
               (delete-blank-lines))
-          (ruby-refactor-assignement-error-message))))
+          (ruby-refactor-assignment-error-message))))
 
 (defun ruby-refactor-define-extracted-method (function-name argument-list function-guts)
   (concat "def " function-name

@@ -11,14 +11,17 @@ These are the refactorings available
  - Convert Post Conditional  (C-c C-r o)
 
 # Install
+The recommended way to install `ruby-refactor` is from Marmalade or [MELPA](http://melpa.milkbox.net).
+
+```
+M-x package-install RET ruby-refactor
+```
+
 To install manually, add ruby-refactor.el to your load path, then:
 
 ```lisp
 (require 'ruby-refactor)
 ```
-
-Alternatively, simply install the `ruby-refactor` package from
-Marmalade or [MELPA](http://melpa.milkbox.net).
 
 In both cases, you must enable `ruby-refactor-minor-mode` in `ruby-mode`:
 
@@ -34,10 +37,10 @@ You'll be prompted for a method name and a new argument list. If your
 extracted method does not take parameters, leave it empty. The method
 will be created above the method you are in with the method contents
 being the selected region. The region will be replaced with a call to
-method.
+the method.
 
 ## Extract Local Variable:
-Select a region o text and invoke `ruby-refactor-extract-local-variable`.
+Select a region of text and invoke `ruby-refactor-extract-local-variable`.
 You'll be prompted for a variable name.  The new variable will
 be created directly above the selected region and the region
 will be replaced with the variable.
@@ -53,7 +56,7 @@ replaced with the constant.
 `ruby-refactor-add-parameter`
 This simply prompts you for a parameter to add to the current
 method definition. If you are on a text, you can just hit enter
-as it will use it by default. There is a custom variable to set
+as it will use it by default. You can set `ruby-refactor-add-parens`
 if you like parens on your params list.  Default values and the
 like shouldn't confuse it.
 
