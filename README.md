@@ -11,7 +11,7 @@ These are the refactorings available
  - Convert Post Conditional  (C-c C-r o)
 
 # Install
-The recommended way to install `ruby-refactor` is from Marmalade or [MELPA](http://melpa.milkbox.net).
+The recommended way to install `ruby-refactor` is from Marmalade or [MELPA](https://melpa.org/).
 
 ```
 M-x package-install RET ruby-refactor
@@ -46,7 +46,7 @@ be created directly above the selected region and the region
 will be replaced with the variable.
 
 ## Extract Constant:
-Select a region of text and invoke `ruby-refactor-extract-contant`.
+Select a region of text and invoke `ruby-refactor-extract-constant`.
 You'll be prompted for a constant name.  The new constant will
 be created at the top of the enclosing class or module directly
 after any include or extend statements and the regions will be

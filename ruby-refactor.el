@@ -51,7 +51,7 @@
 ;; will be replaced with the variable.
 
 ;; ## Extract Constant:
-;; Select a region of text and invoke `ruby-refactor-extract-contant`.
+;; Select a region of text and invoke `ruby-refactor-extract-constant`.
 ;; You'll be prompted for a constant name.  The new constant will
 ;; be created at the top of the enclosing class or module directly
 ;; after any include or extend statements and the regions will be
