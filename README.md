@@ -131,6 +131,19 @@ end
 From the vim plugin, these remain to be done (I don't plan to do them all.)
  - remove inline temp (sexy!)
 
+## How to contribute
+The first thing you'll need to do is to get your tests passing. The tests depend on [Cask](http://cask.github.io/index.html), [ecukes](https://github.com/ecukes/ecukes), and [espuds](https://github.com/ecukes/espuds). Cask is sort of like bundler for emacs and ecukes is basically cucumber for emacs.
+
+To get started, install the necessary components:
+
+    ~$ brew install cask
+    ~$ cask
+
+And run your tests (which should be green):
+
+    ~$ cask exec ecukes
+
+Tests are live in the `features/` directory.
 
 # License
 Copyright (C) 2013 Andrew J Vargo

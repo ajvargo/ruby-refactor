@@ -1,9 +1,8 @@
 Feature: The ruby-refactor-extract-local-variable function
-  
+
   Background:
     Given I have loaded my example Ruby file
     And I turn on ruby-mode
-    And I turn on inf-ruby-minor-mode
     And I turn on ruby-refactor-mode
 
   Scenario: Should extract a local variable
@@ -19,4 +18,3 @@ Feature: The ruby-refactor-extract-local-variable function
           puts foo_var
         end
 """
-
