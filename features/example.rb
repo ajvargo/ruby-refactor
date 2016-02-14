@@ -20,6 +20,10 @@ module Outer
           puts "#{value} is greater than three"
         end
       end
+
+      def has_great_than_three?
+        puts "some are greater than 3" unless long_method.empty?
+      end
     end
   end
 end
