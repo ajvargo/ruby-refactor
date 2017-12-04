@@ -29,6 +29,12 @@ In both cases, you must enable `ruby-refactor-minor-mode` in `ruby-mode`:
 (add-hook 'ruby-mode-hook 'ruby-refactor-mode-launch)
 ```
 
+If you are using 'enh-ruby-mode, use this:
+
+```lisp
+(add-hook 'enh-ruby-mode-hook 'ruby-refactor-mode-launch)
+```
+
 # Usage
 
 ## Extract to Method:
