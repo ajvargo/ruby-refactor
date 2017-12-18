@@ -26,12 +26,13 @@
 ;; Ruby refactor is inspired by the Vim plugin vim-refactoring-ruby,
 ;; currently found at https://github.com/ecomba/vim-ruby-refactoring.
 
-;; I've implemented 5 refactorings
+;; 6 refactorings are implemented:
 ;;  - Extract to Method
 ;;  - Extract Local Variable
 ;;  - Extract Constant
 ;;  - Add Parameter
 ;;  - Extract to Let
+;;  - Convert pre ruby 1.9 hash key style {key => value} to the 1.9 style {key: value}
 
 ; ## Install
 ;; Add this file to your load path.
@@ -99,6 +100,14 @@
 ;; of the let.  If you have location as top, a prefix argument will place
 ;; it closest.  I kinda got nutty with this one.
 
+;; ## Refactor pre 1.9 hash key to 1.9+ model
+
+;; { :foo => :bar }
+;;
+;; becomes
+;;
+;; { foo: :bar }
+;;
 
 ;; ## TODO
 ;; From the vim plugin, these remain to be done (I don't plan to do them all.)
@@ -163,6 +172,7 @@ being altered."
       (define-key prefix-map (kbd "v") 'ruby-refactor-extract-local-variable)
       (define-key prefix-map (kbd "c") 'ruby-refactor-extract-constant)
       (define-key prefix-map (kbd "o") 'ruby-refactor-convert-post-conditional)
+      (define-key prefix-map (kbd "h") 'ruby-refactor-pre-1.9-hash-key)
       (define-key map ruby-refactor-keymap-prefix prefix-map))
     map)
   "Keymap to use in ruby refactor minor mode.")
@@ -310,6 +320,19 @@ This depends the value of `ruby-refactor-let-position'."
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; API
+
+(defun ruby-refactor-pre-1.9-hash-key ()
+  "convert pre-1.9 ruby hash to keys to newer 1.9+ colon style "
+  (interactive)
+  (search-forward-regexp "[^<]=>")
+  (search-backward ":")
+  (delete-char 1)
+  (search-forward-regexp " ")
+  (backward-char 1)
+  (insert ":")
+  (delete-char 3)
+  )
+  
 
 ;;;###autoload
 (defun ruby-refactor-extract-to-method (region-start region-end)
