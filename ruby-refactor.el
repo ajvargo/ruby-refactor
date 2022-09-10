@@ -140,9 +140,9 @@ being altered."
   :type 'string)
 
 (defcustom ruby-refactor-let-position 'top
-  "Where to place the 'let' statement.
-'closest places it after the most recent context or describe.
-'top (default) places it after opening describe"
+  "Where to place the `let' statement.
+\\='closest places it after the most recent context or describe.
+\\='top (default) places it after opening describe"
   :type '(choice (const :tag "place top-most" top)
                  (const :tag "place closest" closest)))
 
@@ -177,7 +177,7 @@ being altered."
   (string-match "=" line))
 
 (defun ruby-refactor-line-has-let-p ()
-  "Return if line contains 'let('."
+  "Return if line contains `let('."
   (string-match "let(" (thing-at-point 'line)))
 
 (defun ruby-refactor-ends-with-newline-p (region-start region-end)
@@ -195,7 +195,8 @@ being altered."
   (replace-regexp-in-string "\\(^\n\\|\n$\\)" "" string))
 
 (defun ruby-refactor-trim-list (list)
-  "Apply `ruby-refactor-trim-string' to each item in LIST, and returns newly trimmed list."
+  "Apply `ruby-refactor-trim-string' to each item in LIST, and
+returns newly trimmed list."
   (mapcar #'ruby-refactor-trim-string list))
 
 (defun ruby-refactor-goto-def-start ()
@@ -208,7 +209,8 @@ being altered."
     (forward-line 1)))
 
 (defun ruby-refactor-goto-constant-insertion-point ()
-  "Move point to the proper location to insert a constant at the top of a class or module."
+  "Move point to the proper location to insert a constant at the top
+of a class or module."
   (search-backward-regexp "^ *\\<class\\|^ *module\\>")
   (forward-line 1)
   (while (or (string-match "include" (thing-at-point 'line))
@@ -361,7 +363,7 @@ This depends the value of `ruby-refactor-let-position'."
 
 ;;;###autoload
 (defun ruby-refactor-extract-to-let(&optional flip-location)
-  "Converts initialization on current line to 'let', ala RSpec
+  "Converts initialization on current line to `let', ala RSpec
 When called with a prefix argument, flips the default location
 for placement.
 If a region is selected, the first line needs to have an assigment.
